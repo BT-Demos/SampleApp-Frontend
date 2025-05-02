@@ -5,6 +5,8 @@ on:
      branches:
       - main
     workflow_dispatch:
+env:
+    artifact_version: 4.0.0
 
 jobs:
   build:
@@ -20,17 +22,17 @@ jobs:
         run: echo "Pushing Binary to ECR..."
 
       - name: Register Build Artifacts in Cloudbees Platform
-        uses: cloudbees-io-gha/register-build-artifact@main
+        uses: cloudbees-io-gha/register-build-artifact@v2
         id: go-action
         with:
           name: "SampleApp-Frontend"
-          version: 3.0.0
-          url: docker.io/SampleApp/SampleApp-Frontend:3.0.0
+          version: $artifact_version
+          url: docker.io/SampleApp/SampleApp-Frontend:$artifact_version
           type: "docker"
           cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
             
       - name: Publish evidence
-        uses: cloudbees-io-gha/publish-evidence-item@main
+        uses: cloudbees-io-gha/publish-evidence-item@v1
         with:
           cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           content: |-
@@ -47,14 +49,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Publish Test Results in Cloudbees Plaform
-        uses: cloudbees-io-gha/publish-test-results@main
+        uses: cloudbees-io-gha/publish-test-results@v1
         with:
           test-type: GO
           results-path: test_reports/*
           cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           
       - name: Publish evidence
-        uses: cloudbees-io-gha/publish-evidence-item@main
+        uses: cloudbees-io-gha/publish-evidence-item@v1
         with:
           cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           content: |-
@@ -74,12 +76,12 @@ jobs:
         uses: actions/checkout@v3
         
       - name: Trigger Deployment
-        uses: cloudbees-io-gha/run-cloudbees-workflow@main
+        uses: cloudbees-io-gha/run-cloudbees-workflow@v1
         id: deploy
         with :
           cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           workflow-file-name: "cbp-deploy.yaml"
-          workflow-inputs: '{"artifactName": "SampleApp-Frontend","artifactVersion": "3.0.0", "environment": "qa"}'
+          workflow-inputs: '{"artifactName": "SampleApp-Frontend","artifactVersion": $artifact_version, "environment": "qa"}'
 
       - name: Use runUrl output
         run: echo "The CloudBees run URL is ${{ steps.deploy.outputs.cbp_run_url}}"
