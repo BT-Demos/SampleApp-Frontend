@@ -26,7 +26,7 @@ jobs:
         id: go-action
         with:
           name: "SampleApp-Frontend"
-          version: $artifact_version
+          version: "$artifact_version"
           url: docker.io/SampleApp/SampleApp-Frontend:$artifact_version
           type: "docker"
           cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
