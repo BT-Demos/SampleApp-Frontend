@@ -6,7 +6,7 @@ on:
       - main
     workflow_dispatch:
 env:
-    artifact_version: 4.0.0
+    artifact_version: 4.0.1
 
 jobs:
   build:
