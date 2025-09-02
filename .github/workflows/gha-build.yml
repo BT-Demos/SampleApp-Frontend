@@ -7,6 +7,9 @@ on:
     workflow_dispatch:
 env:
     artifact_version: 6.0.0
+permissions:
+      id-token: write
+      contents: read
 
 jobs:
   build:
@@ -22,19 +25,17 @@ jobs:
         run: echo "Pushing Binary to ECR..."
 
       - name: Register Build Artifacts in Cloudbees Platform
-        uses: cloudbees-io-gha/register-build-artifact@v2
+        uses: cloudbees-io-gha/register-build-artifact@v3
         id: go-action
         with:
           name: "SampleApp-Frontend"
           version: ${{ env.artifact_version }}
           url: docker.io/SampleApp/SampleApp-Frontend:${{ env.artifact_version }}
           type: "docker"
-          cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
-            
+          
       - name: Publish evidence
-        uses: cloudbees-io-gha/publish-evidence-item@v1
+        uses: cloudbees-io-gha/publish-evidence-item@v2
         with:
-          cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           content: |-
             Build Completed and artifacts published to Cloudbees platform
 
@@ -49,16 +50,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Publish Test Results in Cloudbees Plaform
-        uses: cloudbees-io-gha/publish-test-results@v1
+        uses: cloudbees-io-gha/publish-test-results@v2
         with:
           test-type: GO
           results-path: test_reports/*
           cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           
       - name: Publish evidence
-        uses: cloudbees-io-gha/publish-evidence-item@v1
+        uses: cloudbees-io-gha/publish-evidence-item@v2
         with:
-          cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           content: |-
             Testing Completed and results published to Cloudbees platform
             Test | Results |
@@ -76,10 +76,9 @@ jobs:
         uses: actions/checkout@v3
         
       - name: Trigger Deployment
-        uses: cloudbees-io-gha/run-cloudbees-workflow@v1
+        uses: cloudbees-io-gha/run-cloudbees-workflow@v2
         id: deploy
         with :
-          cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           workflow-file-name: "cbp-deploy.yaml"
           workflow-inputs: '{"artifactName": "SampleApp-Frontend","artifactVersion": "${{ env.artifact_version }}", "environment": "qa"}'
 
