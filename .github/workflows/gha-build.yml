@@ -6,7 +6,7 @@ on:
       - main
     workflow_dispatch:
 env:
-    artifact_version: 6.0.0
+    artifact_version: 7.0.0
 permissions:
       id-token: write
       contents: read
@@ -79,6 +79,7 @@ jobs:
         uses: cloudbees-io-gha/run-cloudbees-workflow@v2
         id: deploy
         with :
+          cloudbees-pat: ${{ secrets.CBP_PAT_PROD }}
           workflow-file-name: "cbp-deploy.yaml"
           workflow-inputs: '{"artifactName": "SampleApp-Frontend","artifactVersion": "${{ env.artifact_version }}", "environment": "qa"}'
 
