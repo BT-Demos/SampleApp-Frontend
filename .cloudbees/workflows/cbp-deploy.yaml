@@ -21,6 +21,7 @@ on:
         required: false
 jobs:
   deploy:
+    name: 'Deploy Artifact'
     environment: qa
     steps:
       - name: Inform system that an artifact version was deployed
